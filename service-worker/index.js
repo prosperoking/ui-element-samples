@@ -32,8 +32,13 @@ handlebars.registerHelper('ifNotEq', function (a, b, opts) {
   }
 });
 
+handlebars.registerHelper('addHash', function (path) {
+  const content = fs.readFileSync(`app${path}`).toString('utf-8');
+  const hash = calculateHash(content);
+  return path.replace(/\.([^.]+)$/, `.${hash}\.$1`);
+});
 
-function calculateETag (content) {
+function calculateHash (content) {
   return crypto
             .createHash('sha256')
             .update(content)
@@ -67,7 +72,7 @@ app.get(toplevelSection, (req, res) => {
     const content = files.join('');
 
     res.set({
-      'ETag': calculateETag(content),
+      'ETag': calculateHash(content),
       'Cache-Control': 'public, no-cache'
     });
     res.send(content);
@@ -84,7 +89,7 @@ app.get(/(\.([a-f0-9]+))?\.([^.]+)$/, (req, res) => {
   fs.readFile(`app${req.url}`)
     .then(file => file.toString('utf-8'))
     .then(content => {
-      const etag = calculateETag(content);
+      const etag = calculateHash(content);
       if (!hasHashInRequest) {
         res.set({
           'ETag': etag,
