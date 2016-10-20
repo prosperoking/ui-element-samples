@@ -30,15 +30,15 @@ limitations under the License.
     </ul>
   </nav>
 
-  {{#ifNotEq item ""}}
+  {{#ifNotEq req.item ""}}
   <sc-view remote class="view-home" route="^/$"></sc-view>
   {{/ifNotEq}}
-  {{#ifNotEq item "about"}}
+  {{#ifNotEq req.item "about"}}
   <sc-view remote class="view-about" route="^/about/(.*)"></sc-view>
   {{/ifNotEq}}
-  {{#ifNotEq item "contact"}}
+  {{#ifNotEq req.item "contact"}}
   <sc-view remote class="view-contact" route="^/contact/(.*)"></sc-view>
   {{/ifNotEq}}
-  {{#ifNotEq item "misc"}}
+  {{#ifNotEq req.item "misc"}}
   <sc-view remote class="view-misc" route="^/misc/(.*)"></sc-view>
   {{/ifNotEq}}

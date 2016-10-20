@@ -45,6 +45,19 @@ function calculateHash (content) {
             .digest('hex');
 }
 
+function mimeTypeFromExtension (ext) {
+  switch (ext) {
+    case 'js':
+      return 'text/javascript';
+    case 'css':
+      return 'text/css';
+    case 'html':
+      return 'text/html';
+    default:
+      return 'text/plain';
+  }
+}
+
 const app = express();
 // Matches paths like `/`, `/index.html`, `/about/` or `/about/index.html`.
 const toplevelSection = /([^/]*)(\/|\/index.html)$/;
@@ -67,7 +80,7 @@ app.get(toplevelSection, (req, res) => {
 
   Promise.all(files)
   .then(files => files.map(f => f.toString('utf-8')))
-  .then(files => files.map(f => handlebars.compile(f)(req)))
+  .then(files => files.map(f => handlebars.compile(f)({req})))
   .then(files => {
     const content = files.join('');
 
@@ -84,27 +97,31 @@ app.get(/(\.([a-f0-9]+))?\.([^.]+)$/, (req, res) => {
   const hash = req.params[1];
   const ext = req.params[2];
   const hasHashInRequest = typeof hash === 'string' && hash !== '';
+  res.set('Content-Type', mimeTypeFromExtension(ext));
 
   req.url = req.url.replace(`.${hash}.${ext}`, `.${ext}`);
   fs.readFile(`app${req.url}`)
     .then(file => file.toString('utf-8'))
-    .then(content => handlebars.compile(content)(req))
     .then(content => {
+      if (req.url.endsWith('.js') || req.url.endsWith('.html')) {
+        content = handlebars.compile(content)({req});
+      }
       const etag = calculateHash(content);
+      console.log(hash, etag);
       if (!hasHashInRequest) {
         res.set({
           'ETag': etag,
-          'Cache-Control': `public, no-cache`
+          'Cache-Control': 'public, no-cache'
         });
         return res.send(content);
       }
       if (hasHashInRequest && hash !== etag) {
-        return res.status(404);
+        return res.status(404).send();
       }
       if (hasHashInRequest && hash === etag) {
         res.set({
           'ETag': etag,
-          'Cache-Control': `public, max-age=${10*365*24*60*60}`
+          'Cache-Control': `public, max-age=${10 * 365 * 24 * 60 * 60}`
         });
         return res.send(content);
       }
