@@ -88,6 +88,7 @@ app.get(/(\.([a-f0-9]+))?\.([^.]+)$/, (req, res) => {
   req.url = req.url.replace(`.${hash}.${ext}`, `.${ext}`);
   fs.readFile(`app${req.url}`)
     .then(file => file.toString('utf-8'))
+    .then(content => handlebars.compile(content)(req))
     .then(content => {
       const etag = calculateHash(content);
       if (!hasHashInRequest) {
