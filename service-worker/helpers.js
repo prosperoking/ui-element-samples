@@ -44,6 +44,24 @@ function executeHandlebars (req, res, next) {
   next();
 }
 
+function setMimeType (req, res, next) {
+  switch(req.ext) {
+    case undefined:
+    case 'html':
+      res.set('Content-Type', 'text/html');
+      break;
+    case 'js':
+      res.set('Content-Type', 'text/javascript');
+      break;
+    case 'css':
+      res.set('Content-Type', 'text/css');
+      break;
+    default:
+      res.set('Content-Type', 'text/plain');
+  }
+  next();
+}
+
 // Set an etag by hashing res.body. Set Cache-Control
 // depending on whether there was a hash in the request
 function setETag (req, res, next) {
@@ -64,5 +82,6 @@ module.exports = {
   readFile,
   handleHashesInNames,
   executeHandlebars,
+  setMimeType,
   setETag
 };

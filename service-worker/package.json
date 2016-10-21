@@ -9,5 +9,8 @@
     "mz": "^2.4.0",
     "spdy": "^3.4.0"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "scripts": {
+    "chrome": "open -a Google\\ Chrome -n --args --user-data-dir=/tmp/foo --ignore-certificate-errors --unsafely-treat-insecure-origin-as-secure=https://localhost:8081"
+  }
 }

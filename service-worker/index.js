@@ -66,6 +66,7 @@ app.get(toplevelSection, (req, res, next) => {
   .catch(error => res.status(500).send(error.toString()));
 });
 app.use(helpers.handleHashesInNames);
+app.use(helpers.setMimeType);
 app.use(helpers.readFile);
 app.use(helpers.executeHandlebars);
 app.use(helpers.setETag);
