@@ -5,9 +5,9 @@
   "dependencies": {
     "express": "^4.14.0",
     "handlebars": "^4.0.5",
-    "spdy": "^3.4.0",
     "http2": "^3.3.5",
-    "mz": "^2.4.0"
+    "mz": "^2.4.0",
+    "spdy": "^3.4.0"
   },
   "devDependencies": {}
 }
