@@ -48,27 +48,25 @@ app.get(toplevelSection, (req, res, next) => {
   // the request to have it available for template rendering.
   req.item = req.params[0];
 
-  // If the request has `?partial`, don't render header and footer.
-  let files;
-  if ('partial' in req.query) {
-    files = [fs.readFile(`app/${req.item}/index.html`)];
-  } else {
+  let files = [fs.readFile(`app/${req.item}/index.html`)];
+  // If the request has no `?partial`, add header and footer
+  if (!('partial' in req.query)) {
     files = [
       fs.readFile('app/header.partial.html'),
-      fs.readFile(`app/${req.item}/index.html`),
+      ...files,
       fs.readFile('app/footer.partial.html')
     ];
   }
 
   Promise.all(files)
-  .then(files => files.map(f => f.toString('utf-8')))
   .then(files => {
-    res.body = files.join('');
+    res.body = files.map(f => f.toString('utf-8')).join('');
     next();
   })
   .catch(error => res.status(500).send(error.toString()));
 });
 app.use(helpers.handleHashesInNames);
+app.use(helpers.readFile);
 app.use(helpers.executeHandlebars);
 app.use(helpers.setETag);
 app.use((req, res, next) => {
